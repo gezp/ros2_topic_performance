@@ -20,7 +20,7 @@ def test_node():
         cpu_percent = 0.0
         cpu_percents = []
         for p in node_processes:
-            cur_cpu = p.cpu_percent(interval=2)
+            cur_cpu = p.cpu_percent(3)
             cpu_percent = cpu_percent + cur_cpu
             cpu_percents.append(cur_cpu)
         memory_percent =0.0
@@ -34,6 +34,6 @@ def test_node():
         # print(memory_percents)
         print("cpu:",cpu_percent,"memory:", memory_percent)
         print("------------------------------------------------")
-        time.sleep(2)
+        time.sleep(1)
 
 test_node()

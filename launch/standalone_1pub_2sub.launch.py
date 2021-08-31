@@ -11,7 +11,7 @@ def generate_launch_description():
         parameters=[
             {"rate" : 50},
             {"message_length":100000},
-            {"use_unique_ptr":True}
+            {"use_unique_ptr":False}
         ],
         output='screen')
     ld.add_action(pub1_node)
