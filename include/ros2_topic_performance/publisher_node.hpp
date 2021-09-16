@@ -16,7 +16,7 @@
 #define ROS2_TOPIC_PERFORMANCE__PUBLISHER_NODE_HPP_
 
 #include "rclcpp/rclcpp.hpp"
-#include "std_msgs/msg/string.hpp"
+#include "geometry_msgs/msg/polygon_stamped.hpp"
 
 namespace ros2_topic_performance
 {
@@ -24,13 +24,20 @@ namespace ros2_topic_performance
 class PublisherNode : public rclcpp::Node
 {
 public:
-  PublisherNode(const std::string & name, rclcpp::NodeOptions options);
+  PublisherNode(rclcpp::NodeOptions options);
 private:
   void on_timer();
-  size_t count_;
+private:
+  // parameters
   bool use_unique_ptr_{false};
-  std::string data_;
-  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
+  bool enable_output_address_{true};
+  int point_num_{10};
+  int rate_{1};
+  // data
+  size_t count_;
+  geometry_msgs::msg::Polygon polygon_;
+  //
+  rclcpp::Publisher<geometry_msgs::msg::PolygonStamped>::SharedPtr publisher_;
   rclcpp::TimerBase::SharedPtr timer_;
 };
 

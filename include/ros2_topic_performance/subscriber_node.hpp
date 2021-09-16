@@ -16,7 +16,7 @@
 #define ROS2_TOPIC_PERFORMANCE__SUBSCRIBER_NODE_HPP_
 
 #include "rclcpp/rclcpp.hpp"
-#include "std_msgs/msg/string.hpp"
+#include "geometry_msgs/msg/polygon_stamped.hpp"
 
 namespace ros2_topic_performance
 {
@@ -24,10 +24,19 @@ namespace ros2_topic_performance
 class SubscriberNode : public rclcpp::Node
 {
 public:
-  SubscriberNode(const std::string & name, rclcpp::NodeOptions options);
+  SubscriberNode(rclcpp::NodeOptions options);
 
 private:
-  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_;
+  // parameters
+  bool enable_output_address_{true};
+  bool enable_output_delay_{true};
+  // data
+  int recv_num_{0};
+  double min_delay_us_{100000};
+  double max_delay_us_{0};
+  double avg_delay_us_{0};
+  //
+  rclcpp::Subscription<geometry_msgs::msg::PolygonStamped>::SharedPtr subscription_;
 };
 
 }  // namespace ros2_topic_performance

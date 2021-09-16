@@ -28,38 +28,64 @@ using namespace std::chrono_literals;
 namespace ros2_topic_performance{
 
 
-PublisherNode::PublisherNode(const std::string & name, rclcpp::NodeOptions options)
-: Node(name, options), count_(0)
+PublisherNode::PublisherNode(rclcpp::NodeOptions options)
+: Node("publisher", options), count_(0)
 {
   declare_parameter("rate", 1);
-  declare_parameter("message_length", 10);
+  declare_parameter("point_num", 10);
   declare_parameter("use_unique_ptr", false);
-  int message_length,rate;
-  get_parameter("rate", rate);
-  get_parameter("message_length", message_length);
+  declare_parameter("enable_output_address", false);
+  get_parameter("rate", rate_);
+  get_parameter("point_num", point_num_);
   get_parameter("use_unique_ptr", use_unique_ptr_);
-  data_ = std::string(message_length,'a');
-  publisher_ = create_publisher<std_msgs::msg::String>("topic", 10);
-  auto period_ms = std::chrono::milliseconds(static_cast<int64_t>(1000.0 / rate));
+  get_parameter("enable_output_address", enable_output_address_);
+  // create msg data
+  // data_ = std::string(point_num_,'a');
+  geometry_msgs::msg::Point32 point;
+  for(int i=0; i< point_num_; i++){
+    point.x = point.y = point.z = 0.001*i;
+    polygon_.points.push_back(point);
+  }
+  // create publisher and timer
+  publisher_ = create_publisher<geometry_msgs::msg::PolygonStamped>("topic", 10);
+  auto period_ms = std::chrono::milliseconds(static_cast<int64_t>(1000.0 / rate_));
   timer_ = create_wall_timer(period_ms, std::bind(&PublisherNode::on_timer, this));
 }
 
 void PublisherNode::on_timer()
 {
+  // update data
+  count_++;
+  polygon_.points[0].x = 0.0001 * count_;
+  auto cur_time = this->now();
+  // publish
   if(use_unique_ptr_){
-    auto msg = std::make_unique<std_msgs::msg::String>();
-    msg->data = std::to_string(count_++) + "-" + data_;
-    RCLCPP_INFO(this->get_logger(), "Published message: '%10.10s', address: 0x%lx \n",
-      msg->data.c_str(), reinterpret_cast<std::uintptr_t>(msg.get()));
+    auto msg = std::make_unique<geometry_msgs::msg::PolygonStamped>();
+    msg->header.stamp = cur_time;
+    msg->polygon = polygon_;
+    if(enable_output_address_){
+      RCLCPP_INFO(this->get_logger(), "Publish message: '%8.5f', address: 0x%lx\n",
+        msg->polygon.points[0].x, reinterpret_cast<std::uintptr_t>(msg.get()));
+    }
     publisher_->publish(std::move(msg));
   }else{
-    std_msgs::msg::String msg;
-    msg.data = std::to_string(count_++) + "-" + data_;
-    RCLCPP_INFO(this->get_logger(), "Published message: '%10.10s', address: 0x%lx \n",
-      msg.data.c_str(), reinterpret_cast<std::uintptr_t>(&msg));
+    geometry_msgs::msg::PolygonStamped msg;
+    msg.header.stamp = cur_time;
+    msg.polygon = polygon_;
+    if(enable_output_address_){
+      RCLCPP_INFO(this->get_logger(), "Publish message: '%8.5f', address: 0x%lx\n",
+        msg.polygon.points[0].x, reinterpret_cast<std::uintptr_t>(&msg));
+    }
     publisher_->publish(msg);
   }
 
 }
 
 }
+
+#include "rclcpp_components/register_node_macro.hpp"
+
+// Register the component with class_loader.
+// This acts as a sort of entry point, allowing the component to be discoverable when its library
+// is being loaded into a running process.
+RCLCPP_COMPONENTS_REGISTER_NODE(ros2_topic_performance::PublisherNode)

@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <string.h>
+
 #include <memory>
 #include <thread>
+#include <string>
 
 #include "rclcpp/rclcpp.hpp"
 #include "ros2_topic_performance/utils.hpp"
@@ -30,14 +33,11 @@ int main(int argc, char * argv[])
   rclcpp::init(argc, argv);
 
   rclcpp::NodeOptions options;
-  //options.use_intra_process_comms(true);
-  auto sub1 = std::make_shared<SubscriberNode>("subscriber1",options);
+  auto sub1 = std::make_shared<SubscriberNode>(options);
   // spin
-  std::vector<std::shared_ptr<std::thread>> threads;
-  threads.push_back(create_spin_thread(sub1));
-  for(auto t: threads){
-    t->join();
-  }
+  rclcpp::executors::SingleThreadedExecutor executor;
+  executor.add_node(sub1);
+  executor.spin();
   rclcpp::shutdown();
 
   return 0;

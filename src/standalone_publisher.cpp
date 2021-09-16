@@ -30,14 +30,12 @@ int main(int argc, char * argv[])
   rclcpp::init(argc, argv);
 
   rclcpp::NodeOptions options;
-  //options.use_intra_process_comms(true);
-  auto pub1 = std::make_shared<PublisherNode>("publisher1",options);
+  auto pub1 = std::make_shared<PublisherNode>(options);
   // spin
   std::vector<std::shared_ptr<std::thread>> threads;
-  threads.push_back(create_spin_thread(pub1));
-  for(auto t: threads){
-    t->join();
-  }
+  rclcpp::executors::SingleThreadedExecutor executor;
+  executor.add_node(pub1);
+  executor.spin();
   rclcpp::shutdown();
 
   return 0;

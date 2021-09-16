@@ -24,16 +24,43 @@
 namespace ros2_topic_performance
 {
 
-SubscriberNode::SubscriberNode(const std::string & name, rclcpp::NodeOptions options)
-: Node(name, options)
+SubscriberNode::SubscriberNode(rclcpp::NodeOptions options)
+: Node("subscriber", options)
 {
-  subscription_ = create_subscription<std_msgs::msg::String>(
+  declare_parameter("enable_output_address", false);
+  declare_parameter("enable_output_delay", false);
+  get_parameter("enable_output_address", enable_output_address_);
+  get_parameter("enable_output_delay", enable_output_delay_);
+  subscription_ = create_subscription<geometry_msgs::msg::PolygonStamped>(
     "topic",
     10,
-    [this](std_msgs::msg::String::SharedPtr msg) {
-      RCLCPP_INFO(this->get_logger(), "Received message: '%10.10s', address: 0x%lx\n",
-        msg->data.c_str(), reinterpret_cast<std::uintptr_t>(msg.get()));
+    [this](geometry_msgs::msg::PolygonStamped::SharedPtr msg) {
+      //
+      auto cur_time = this->now();
+      if(enable_output_address_){
+        RCLCPP_INFO(this->get_logger(), "Received message: '%8.5f', address: 0x%lx\n",
+          msg->polygon.points[0].x, reinterpret_cast<std::uintptr_t>(msg.get()));
+      }
+      //printf latency
+      if(enable_output_delay_){
+        auto diff = cur_time - msg->header.stamp;
+        auto delay = 0.001 * diff.nanoseconds();
+        recv_num_ ++;
+        avg_delay_us_ = avg_delay_us_ + (delay-avg_delay_us_)/recv_num_;
+        min_delay_us_ = std::min(delay, min_delay_us_);
+        max_delay_us_ = std::max(delay, max_delay_us_);
+        RCLCPP_INFO(this->get_logger(), "delay info: cur[%.3f],avg[%.3f],min[%.3f],max[%.3f]x\n",
+            delay,avg_delay_us_,min_delay_us_,max_delay_us_);
+        //min_delay_us_;
+      }
     });
 }
 
 }
+
+#include "rclcpp_components/register_node_macro.hpp"
+
+// Register the component with class_loader.
+// This acts as a sort of entry point, allowing the component to be discoverable when its library
+// is being loaded into a running process.
+RCLCPP_COMPONENTS_REGISTER_NODE(ros2_topic_performance::SubscriberNode)
