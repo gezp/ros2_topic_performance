@@ -18,7 +18,7 @@ test_params["enable_output_address"]=False
 test_params["publisher_num"] = 1
 test_params["subscriber_num"] = 1
 test_params["rate"]= 100
-test_params["point_num"]= 100000
+test_params["point_num"]= 10000
 
 killall()
 # case1
