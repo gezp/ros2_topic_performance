@@ -28,7 +28,7 @@ python scripts/test_1pub_1sub.py
 test `a multi-threaded-executor` vs `multiple single-threaded-executor` for composition
 
 ```bash
-test_use_dedicated_executors.py
+python scripts/test_use_dedicated_executors.py
 ```
 
 * a sample result is avialable : [result](scripts/test_use_dedicated_executors_result.txt)
