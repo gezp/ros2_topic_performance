@@ -31,5 +31,5 @@ killall()
 print("case 1: standalone publisher and standalone subscriber")
 test_standalone_nodes(test_params)
 # case2
-print("case 2: composed publisher and composed subscriber")
+print("case 2: composed publisher and composed subscriber (with multiple single-threaded-executor)")
 test_composed_nodes(test_params)

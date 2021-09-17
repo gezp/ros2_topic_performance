@@ -23,7 +23,7 @@ test `standalone publisher and subscriber` vs `composed publisher and subscriber
 python scripts/test_1pub_1sub.py
 ```
 
-* a sample result is avialable : [result](scripts/test_1pub_1sub_result.txt)
+* a sample result is avialable : [result](test_result/test_1pub_1sub.txt)
 
 test `a multi-threaded-executor` vs `multiple single-threaded-executor` for composition
 
@@ -31,7 +31,8 @@ test `a multi-threaded-executor` vs `multiple single-threaded-executor` for comp
 python scripts/test_use_dedicated_executors.py
 ```
 
-* a sample result is avialable : [result](scripts/test_use_dedicated_executors_result.txt)
+* a sample result is avialable : [result](test_result/test_use_dedicated_executors.txt)
+* the thread num of multi-threaded-executor is the num of nodes (in this cases, thread num=2)
 
 ## Test Method
 

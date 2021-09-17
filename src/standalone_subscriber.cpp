@@ -19,7 +19,6 @@
 #include <string>
 
 #include "rclcpp/rclcpp.hpp"
-#include "ros2_topic_performance/utils.hpp"
 #include "ros2_topic_performance/publisher_node.hpp"
 #include "ros2_topic_performance/subscriber_node.hpp"
 

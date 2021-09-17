@@ -16,11 +16,47 @@
 #include <thread>
 
 #include "rclcpp/rclcpp.hpp"
-#include "ros2_topic_performance/utils.hpp"
 #include "ros2_topic_performance/publisher_node.hpp"
 #include "ros2_topic_performance/subscriber_node.hpp"
 
 using namespace ros2_topic_performance;
+
+rclcpp::NodeOptions get_node_options(const std::string &name,bool use_intra_process_comms){
+  rclcpp::NodeOptions options;
+  if(!name.empty()){
+    options.arguments({"--ros-args", "-r", std::string("__node:=") + name, "--"});
+  }
+  options.use_intra_process_comms(use_intra_process_comms);
+  return options;
+}
+
+template<typename NodeT>
+std::shared_ptr<std::thread> create_spin_thread(NodeT node){
+  return std::make_shared<std::thread>([node](){
+      rclcpp::executors::SingleThreadedExecutor executor;
+      executor.add_node(node->get_node_base_interface());
+      executor.spin();
+      executor.remove_node(node->get_node_base_interface());
+  });
+}
+
+void multi_spin(std::vector<rclcpp::Node::SharedPtr> nodes, bool use_dedicated_executors){
+  if(use_dedicated_executors){
+    std::vector<std::shared_ptr<std::thread>> threads;
+    for(auto node: nodes){
+      threads.push_back(create_spin_thread(node));
+    }
+    for(auto t: threads){
+      t->join();
+    }
+  }else{
+    rclcpp::executors::MultiThreadedExecutor executor(rclcpp::ExecutorOptions(),nodes.size());
+    for(auto node: nodes){
+      executor.add_node(node);
+    }
+    executor.spin();
+  }
+}
 
 int main(int argc, char * argv[])
 {
