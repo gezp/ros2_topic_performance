@@ -8,7 +8,7 @@ In ROS 2, you can compose multiple nodes in a single process with the lower over
 
 this package aims to test performance (cpu and memory usage) between standalone nodes and composed nodes.
 
-* this package only considers manual composition (compile-time composition), it's performance should as same as run-time composition
+* this package only considers manual composition (compile-time composition), its performance should as same as run-time composition
 
 ## Quickly Test
 
