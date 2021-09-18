@@ -5,7 +5,7 @@ from my_utils import *
 # test standalone nodes
 def test_standalone_nodes(params = {},debug = False):
     # launch
-    node_processes = launch_standalone_nodes(pub_num=test_params["publisher_num"],sub_num=test_params["subscriber_num"],params=params)
+    node_processes = launch_standalone_nodes(pub_num=params["publisher_num"],sub_num=params["subscriber_num"],params=params)
     cpu_percent,memory_percent = performace_test(node_processes,time=10,enable_ouput=debug)
     print("cpu:",cpu_percent,"memory:", memory_percent)
     for p in node_processes:
