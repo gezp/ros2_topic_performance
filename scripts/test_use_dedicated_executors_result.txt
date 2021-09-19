@@ -1,4 +1,0 @@
-case 1: composed publisher and composed subscriber with a multi-threaded-executor
-cpu: 7.9 memory: 0.04742007010559746
-case 2: composed publisher and composed subscriber with multiple single-threaded-executor
-cpu: 6.4 memory: 0.04717613970381971
