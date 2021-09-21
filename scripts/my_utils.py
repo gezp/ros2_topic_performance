@@ -41,28 +41,23 @@ def launch_composed_nodes(params):
     node_processes = get_process("composed_npub_nsub")
     return node_processes
 
-def performace_test(node_processes, time = 5, enable_ouput = False):
+def performace_test(node_processes, time_sec = 5, enable_ouput = False):
     # do something
     cpu_sum = 0
     mem_sum = 0
     cnt = 0
-    while(cnt<time):
+    while(cnt<time_sec):
         cpu_percent = 0.0
-        cpu_percents = []
         for p in node_processes:
-            cur_cpu = p.cpu_percent(1)
-            cpu_percent = cpu_percent + cur_cpu
-            cpu_percents.append(cur_cpu)
+            cpu_percent = cpu_percent + p.cpu_percent()
         memory_percent =0.0
-        memory_percents = []
         for p in node_processes:
-            cur_mem = p.memory_percent()
-            memory_percent = memory_percent + cur_mem
-            memory_percents.append(1.0*int(cur_mem*100)/100)
+            memory_percent = memory_percent + p.memory_percent()
         if enable_ouput:
             print("cpu:",cpu_percent,"memory:", memory_percent)
             print("------------------------------------------------")
+        time.sleep(1.0)
         mem_sum += memory_percent
         cpu_sum += cpu_percent
         cnt=cnt+1
-    return cpu_sum/time,mem_sum/time
+    return cpu_sum/cnt, mem_sum/cnt
